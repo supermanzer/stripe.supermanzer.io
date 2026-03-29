@@ -1,0 +1,23 @@
+{
+  "name": "stripe-supermanzer-io",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@nuxt/content": "^3.12.0",
+    "@nuxt/eslint": "^1.15.2",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxt/image": "^2.0.0",
+    "@vueuse/nuxt": "^14.2.1",
+    "better-sqlite3": "^12.8.0",
+    "nuxt": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}
