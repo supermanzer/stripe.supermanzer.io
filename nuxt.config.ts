@@ -7,7 +7,44 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/eslint',
     '@vueuse/nuxt',
+    'vuetify-nuxt-module',
   ],
+  vuetify: {
+    moduleOptions: {},
+    vuetifyOptions: {
+      theme: {
+        defaultTheme: 'light',
+        themes: {
+          light: {
+            dark: false,
+            colors: {
+              primary: '#1867C0',
+              secondary: '#48A9A6',
+              background: '#FFFFFF',
+              surface: '#FFFFFF',
+              error: '#B00020',
+              info: '#2196F3',
+              success: '#4CAF50',
+              warning: '#FB8C00',
+            },
+          },
+          dark: {
+            dark: true,
+            colors: {
+              primary: '#2196F3',
+              secondary: '#48A9A6',
+              background: '#121212',
+              surface: '#212121',
+              error: '#CF6679',
+              info: '#2196F3',
+              success: '#4CAF50',
+              warning: '#FB8C00',
+            },
+          },
+        },
+      },
+    },
+  },
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
 
