@@ -4,24 +4,17 @@
 import type { Stripe } from 'stripe'
 
 export function usePaymentIntent() {
-  const intent = ref<Stripe.PaymentIntent | null>(null)
-  const pending = ref(false)
-  const error = ref<Error | null>(null)
-
-  async function createPaymentIntent() {
-    pending.value = true
-    error.value = null
-    try {
-      const data = await $fetch<{ intent: Stripe.PaymentIntent }>('/api/stripe/payment-intents', {
+  return useAsyncData<{ intent: Stripe.PaymentIntent }>(
+    'payment-intent',
+    (_nuxtApp, { signal }) =>
+      $fetch('/api/stripe/payment-intents', {
         method: 'POST',
-      })
-      intent.value = data.intent
-    } catch (e) {
-      error.value = e as Error
-    } finally {
-      pending.value = false
-    }
-  }
-
-  return { intent, pending, error, createPaymentIntent }
+        signal,
+      }),
+    {
+      server: false,    // user-triggered; skip SSR
+      immediate: false, // don't fire on mount
+      dedupe: 'cancel', // cancel in-flight if re-triggered
+    },
+  )
 }

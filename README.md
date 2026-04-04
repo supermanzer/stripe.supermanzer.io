@@ -1,75 +1,107 @@
-# Nuxt Content Starter
+# stripe.supermanzer.io
 
-Look at the [Nuxt Content documentation](https://content.nuxt.com) to learn more.
+A document-driven showcase of [Stripe](https://stripe.com) payment integrations built with [Nuxt 4](https://nuxt.com), [Vuetify](https://vuetifyjs.com), and [Nuxt Content v3](https://content.nuxt.com).
+
+Each integration is a Markdown page that embeds a live, working Stripe component using MDC syntax. The goal is a clean reference site where the implementation details and the working demo live side by side.
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Nuxt 4 |
+| UI | Vuetify 4 |
+| Content | Nuxt Content v3 (Markdown + MDC) |
+| Stripe client | `@stripe/stripe-js` |
+| Stripe server | `stripe-node` |
+| Fonts | `@nuxt/fonts` (Montserrat + Lato) |
+| Utilities | VueUse |
+
+## Integrations
+
+| Page | Route |
+|------|-------|
+| Payment Element | `/integrations/payment-element` |
 
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+Copy the example env file and add your Stripe test keys:
 
 ```bash
-# npm
-npm run dev
+cp .env.example .env
+```
 
-# pnpm
-pnpm dev
+```ini
+STRIPE_PK=pk_test_...
+STRIPE_SK=sk_test_...
+```
 
-# yarn
-yarn dev
+## Development
 
-# bun
-bun run dev
+```bash
+npm run dev       # http://localhost:3000
 ```
 
 ## Production
 
-Build the application for production:
-
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+npm run build     # Build for production
+npm run generate  # Static site generation
+npm run preview   # Preview production build
 ```
 
-Locally preview production build:
+## Adding an Integration
 
-```bash
-# npm
-npm run preview
+1. Create `content/integrations/<slug>.md` with frontmatter:
 
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+```yaml
+---
+title: Your Integration Name
+description: One-line description of what this demonstrates.
+docs:
+  - https://docs.stripe.com/...
+---
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+2. Add a corresponding component at `app/components/stripe/<ComponentName>.vue`.
+3. Embed it in the Markdown via MDC: `::stripe-<component-name>`
+
+The new route and index card appear automatically — no page files or nav config needed.
+
+## Project Structure
+
+```
+app/
+  app.vue                   # Root; global font + heading styles
+  app.config.ts             # stripe.successPath, stripe.cancelPath
+  layouts/default.vue       # App shell: header, v-main, footer
+  plugins/stripe.client.ts  # Loads Stripe.js; provides $stripe
+  composables/
+    usePaymentIntent.ts     # useAsyncData wrapper for POST /api/stripe/payment-intents
+  components/
+    layout/
+      AppHeader.vue         # Gradient app bar with site nav
+      AppFooter.vue         # Gradient footer
+      Card.vue              # Vuetify card wrapper used by Stripe components
+    stripe/
+      PaymentElement.vue    # Stripe Payment Element integration
+  pages/
+    index.vue               # Home: renders index.md + integration card grid
+    [...slug].vue           # Catch-all: renders any content/*.md page
+
+server/
+  utils/stripe.ts           # useServerStripe() singleton
+  api/stripe/
+    payment-intents/index.post.ts  # POST /api/stripe/payment-intents
+
+content/
+  index.md                  # Home page content
+  about.md                  # About page
+  integrations/
+    payment-element.md      # Payment Element demo page
+```

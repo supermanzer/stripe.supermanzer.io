@@ -1,7 +1,13 @@
 <template>
-   <LayoutCard img="https://images.pexels.com/photos/4482896/pexels-photo-4482896.jpeg" title="Payment Element" subtitle="Collect multiple payment method types through a single interface">
+   <LayoutCard 
+     img="https://images.pexels.com/photos/4482896/pexels-photo-4482896.jpeg" 
+     title="Payment Element" 
+     subtitle="Collect multiple payment method types through a single interface"
+     >
+     <template #text><slot name="text" /></template>
+
     <template #default>
-        <div class="payment-element"/>
+        <div id="payment-element"/>
     </template>
     <template #actions>
         <v-row class="my-6" justify="space-around">
@@ -15,38 +21,44 @@
 import type { StripePaymentElement, StripeElements } from '@stripe/stripe-js';
 
 const {$stripe} = useNuxtApp();
-if ($stripe == null) {
-    throw new Error("Stripe instance undefined!");
-}
 
-const {intent, pending, error, createPaymentIntent} = usePaymentIntent();
+const {data, error, execute} = usePaymentIntent();
 const { origin } = useRequestURL();
-const { stripe } =useAppConfig();
+const { stripe } = useAppConfig();
 
 const successUrl = `${origin}${stripe.successPath}`
 
 const elements = ref<StripeElements|null>(null)
 const element = ref<StripePaymentElement|null>(null)
 
-await createPaymentIntent();
+await execute();
 
-if (error.value === null && $stripe != null && intent.value !== null && intent.value.client_secret !== null && !pending) {
-    elements.value = $stripe.elements({
-        clientSecret: intent.value.client_secret
-    });
-    element.value = elements.value.create('payment');
-    element.value.mount('#payment-element');
-} else {
-    console.log("INTENT VALUE:\n", intent);
-}
+onMounted(() => {
+    if (error.value == null && $stripe != null && data.value?.intent?.client_secret != null) {
+        elements.value = $stripe.elements({
+            clientSecret: data.value.intent.client_secret
+        });
+        element.value = elements.value.create('payment');
+        element.value.mount('#payment-element');
+    } else {
+        console.error("Failed to initialize Payment Element", { error: error.value, intent: data.value?.intent });
+    }
+})
 
 const confirmPayment = async() => {
+    if (elements.value === null || $stripe == null) {
+        console.error("Cannot confirm: Stripe or Elements not initialized");
+        return
+    }
     const {error} = await $stripe.confirmPayment({
         elements: elements.value,
         confirmParams: {
             return_url: successUrl
         }
     })
+    if (error) {
+        console.error("PAYMENT INTENT CONFIRMATION ERROR:\n", error);
+    }
 }
 
 </script>
