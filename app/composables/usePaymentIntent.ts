@@ -4,11 +4,14 @@
 import type { Stripe } from 'stripe'
 
 export function usePaymentIntent() {
+  const params = useStripeParams()
+
   return useAsyncData<{ intent: Stripe.PaymentIntent }>(
     'payment-intent',
     (_nuxtApp, { signal }) =>
       $fetch('/api/stripe/payment-intents', {
         method: 'POST',
+        body: params.value.paymentIntent.server,
         signal,
       }),
     {

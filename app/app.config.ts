@@ -1,5 +1,5 @@
 export default defineAppConfig({
-  stripe: {
+  urls: {
     successPath: '/success',
     cancelPath: '/cancel',
   },

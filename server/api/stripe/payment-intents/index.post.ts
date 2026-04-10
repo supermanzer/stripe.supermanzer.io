@@ -1,14 +1,15 @@
+import type { Stripe } from 'stripe'
+import { useServerStripe } from '~~/server/utils/stripe'
 
-import { useServerStripe } from "~~/server/utils/stripe"
+export default defineEventHandler(async (event) => {
+  const stripe = useServerStripe()
+  const body = await readBody<Partial<Stripe.PaymentIntentCreateParams>>(event)
 
-export default defineEventHandler(async () => {
-    // console.log("POST REQUEST TO PAYMENT INTENTS:\n", event);
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: 1999,
+    currency: 'usd',
+    ...body,
+  })
 
-    const stripe = useServerStripe();
-
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: 1999,
-        currency: 'usd',
-    })
-    return { intent: paymentIntent }
+  return { intent: paymentIntent }
 })

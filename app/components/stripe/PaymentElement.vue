@@ -22,11 +22,15 @@ import type { StripePaymentElement, StripeElements } from '@stripe/stripe-js';
 
 const {$stripe} = useNuxtApp();
 
+const params = useStripeParams();
+
 const {data, error, execute} = usePaymentIntent();
 const { origin } = useRequestURL();
-const { stripe } = useAppConfig();
+const { urls } = useAppConfig();
 
-const successUrl = `${origin}${stripe.successPath}`
+
+
+const successUrl = `${origin}${urls.successPath}`
 
 const elements = ref<StripeElements|null>(null)
 const element = ref<StripePaymentElement|null>(null)
@@ -53,7 +57,8 @@ const confirmPayment = async() => {
     const {error} = await $stripe.confirmPayment({
         elements: elements.value,
         confirmParams: {
-            return_url: successUrl
+            return_url: successUrl,
+            ...params.value.paymentIntent.confirm,
         }
     })
     if (error) {
