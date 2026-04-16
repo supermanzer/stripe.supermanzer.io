@@ -1,20 +1,33 @@
 <template>
-   <LayoutCard 
-     img="https://images.pexels.com/photos/4482896/pexels-photo-4482896.jpeg" 
-     title="Payment Element" 
-     subtitle="Collect multiple payment method types through a single interface"
-     >
-     <template #text><slot name="text" /></template>
-
-    <template #default>
+  <div style="position: relative;">
+    <v-card 
+    title="Payment Element"
+    flat
+    >
+        <slot name="text" />
         <div id="payment-element"/>
-    </template>
-    <template #actions>
         <v-row class="my-6" justify="space-around">
             <v-btn variant="elevated" color="primary" text="Confirm" @click="confirmPayment"/>
         </v-row>
-    </template>
-   </LayoutCard>
+
+
+    <v-dialog v-model="showReloadDialog" max-width="480" persistent contained>
+        <v-card>
+            <v-card-title>Parameters Changed</v-card-title>
+            <v-divider />
+            <v-card-text>
+            Payment Intent parameters have changed. Reload the Payment Element to create a new Payment Intent with the updated parameters, or dismiss to keep the current one.
+            </v-card-text>
+            <v-card-actions>
+            <v-spacer />
+            
+            <v-btn variant="elevated" color="teal-darken-4" @click="reload">Reload</v-btn>
+            </v-card-actions>
+            
+        </v-card>
+    </v-dialog>
+   </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -28,16 +41,15 @@ const {data, error, execute} = usePaymentIntent();
 const { origin } = useRequestURL();
 const { urls } = useAppConfig();
 
-
-
 const successUrl = `${origin}${urls.successPath}`
 
 const elements = ref<StripeElements|null>(null)
 const element = ref<StripePaymentElement|null>(null)
+const showReloadDialog = ref(false)
 
 await execute();
 
-onMounted(() => {
+const mountElement = () => {
     if (error.value == null && $stripe != null && data.value?.intent?.client_secret != null) {
         elements.value = $stripe.elements({
             clientSecret: data.value.intent.client_secret
@@ -47,7 +59,24 @@ onMounted(() => {
     } else {
         console.error("Failed to initialize Payment Element", { error: error.value, intent: data.value?.intent });
     }
+}
+
+onMounted(mountElement)
+
+watch(() => params.value.hasChanged, (changed) => {
+    if (changed) showReloadDialog.value = true
 })
+
+const reload = async () => {
+    element.value?.unmount()
+    element.value = null
+    elements.value = null
+    await execute()
+    await nextTick()
+    mountElement()
+    params.value.hasChanged = false
+    showReloadDialog.value = false
+}
 
 const confirmPayment = async() => {
     if (elements.value === null || $stripe == null) {

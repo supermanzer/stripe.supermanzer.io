@@ -6,5 +6,9 @@ export default defineContentConfig({
       type: 'page',
       source: '**',
     }),
+    snippets: defineCollection({
+      type: 'data',
+      source: 'snippets/*'
+    })
   },
 })

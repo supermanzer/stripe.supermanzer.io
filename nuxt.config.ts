@@ -46,6 +46,9 @@ export default defineNuxtConfig({
       },
     },
   },
+  routeRules: {
+    '/integrations/**': { ssr: false },
+  },
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
 
