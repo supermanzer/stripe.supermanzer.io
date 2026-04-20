@@ -1,6 +1,19 @@
 /// <reference types="node" />
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  content: {
+    build: {
+      markdown: {
+        highlight: {
+          theme: {
+            default: 'night-owl-light',
+            dark: 'night-owl',
+          },
+          langs: ['typescript', 'javascript', 'bash', 'json', 'vue'],
+        },
+      },
+    },
+  },
   modules: [
     '@nuxt/content',
     '@nuxt/fonts',
@@ -47,8 +60,9 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    '/integrations/**': { ssr: false },
+    // '/integrations/**': { ssr: false },
   },
+  css: ['~/assets/css/shiki.css'],
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
 

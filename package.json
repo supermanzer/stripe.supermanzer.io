@@ -14,12 +14,12 @@
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/icon": "^2.2.1",
     "@nuxt/image": "^2.0.0",
-    "@stripe/stripe-js": "^9.0.0",
+    "@stripe/stripe-js": "^9.2.0",
     "@vueuse/nuxt": "^14.2.1",
     "better-sqlite3": "^12.8.0",
     "nuxt": "^4.4.2",
-    "stripe": "^21.0.1",
-    "vuetify": "^4.0.4",
+    "stripe": "^22.0.2",
+    "vuetify": "^4.0.5",
     "vuetify-nuxt-module": "^0.19.5"
   },
   "devDependencies": {

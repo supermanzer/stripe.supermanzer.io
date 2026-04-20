@@ -7,6 +7,11 @@
         <slot name="text" />
         <div id="payment-element"/>
         <v-row class="my-6" justify="space-around">
+            <v-tooltip location="left" text="Check testing docs for Payment Methods (e.g. card numbers) you can use">
+                <template #activator="{props}">
+                    <v-btn variant="elevated" color="grey" href="https://docs.stripe.com/testing" target="_blank" text="Test Docs" v-bind="props"/>
+                </template>
+            </v-tooltip>
             <v-btn variant="elevated" color="primary" text="Confirm" @click="confirmPayment"/>
         </v-row>
 
@@ -16,7 +21,7 @@
             <v-card-title>Parameters Changed</v-card-title>
             <v-divider />
             <v-card-text>
-            Payment Intent parameters have changed. Reload the Payment Element to create a new Payment Intent with the updated parameters, or dismiss to keep the current one.
+            Payment Intent parameters have changed. Reload the Payment Element to create a new Payment Intent with the updated parameters.
             </v-card-text>
             <v-card-actions>
             <v-spacer />
@@ -31,7 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import type { StripePaymentElement, StripeElements } from '@stripe/stripe-js';
+import type { StripePaymentElement, StripeElements, Appearance } from '@stripe/stripe-js';
+
+const { isDark } = useThemePreference()
+
+const appearance = computed<Appearance>(() => ({
+    theme: isDark.value ? 'night' : 'stripe'
+}))
 
 const {$stripe} = useNuxtApp();
 
@@ -52,7 +63,8 @@ await execute();
 const mountElement = () => {
     if (error.value == null && $stripe != null && data.value?.intent?.client_secret != null) {
         elements.value = $stripe.elements({
-            clientSecret: data.value.intent.client_secret
+            clientSecret: data.value.intent.client_secret,
+            appearance: appearance.value,
         });
         element.value = elements.value.create('payment');
         element.value.mount('#payment-element');

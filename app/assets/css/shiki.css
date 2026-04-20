@@ -1,0 +1,9 @@
+/* Default (light mode) — night-owl-light background */
+.shiki {
+  background-color: #EFEFEF !important;
+}
+
+/* Dark mode — night-owl background, toggled via html.dark set by useThemePreference */
+html.dark .shiki {
+  background-color: #011627 !important;
+}

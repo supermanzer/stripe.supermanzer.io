@@ -1,5 +1,5 @@
 <template>
-    <v-menu>
+    <v-menu location="bottom end">
         <template #activator="{props: menu}">
             <v-tooltip :text="tooltipText">
                 <template #activator="{props: tipProp}">
@@ -7,7 +7,7 @@
                 </template>
             </v-tooltip>
         </template>
-        <v-card class="pa-4 w-50" :color="cardColor">
+        <v-card class="pa-4" max-width="400" :color="cardColor">
             <slot/>
         </v-card>
     </v-menu>

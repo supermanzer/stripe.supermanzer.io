@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :theme="currentTheme">
     <LayoutAppHeader />
     <v-main>
       <v-container :fluid="fluid">
@@ -11,6 +11,6 @@
 </template>
 
 <script setup lang="ts">
-// Reduce horizontal margins on smaller displays
-const {mdAndDown: fluid} = useDisplay()
+const { mdAndDown: fluid } = useDisplay()
+const { currentTheme } = useThemePreference()
 </script>
