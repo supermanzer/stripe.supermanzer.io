@@ -48,7 +48,7 @@ onUnmounted(() => {
       v-if="docs.length"
       v-model="docsOpen"
       location="right"
-      :width="280"
+      :width="380"
       temporary
     >
       <stripe-docs-list :docs="docs" />
@@ -62,7 +62,7 @@ onUnmounted(() => {
           color="primary"
           position="fixed"
           v-bind="props"
-          :style="{ right: docsOpen ? '280px' : '0', top: '50%', transform: 'translateY(-50%)' }"
+          :style="{ right: docsOpen ? '380px' : '0', top: '50%', transform: 'translateY(-50%)' }"
           rounded="s-lg e-0"
           @click="docsOpen = !docsOpen"
         />

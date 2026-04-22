@@ -9,3 +9,8 @@ export interface Snippet {
     path: string;
     label: 'server' | 'client';
 }
+
+export enum ElementType {
+    IntentFirst = "intent-first",
+    Deferred = "deferred"
+}

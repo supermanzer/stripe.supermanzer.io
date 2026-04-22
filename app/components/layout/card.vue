@@ -47,14 +47,7 @@ const {img, title, subtitle, imgHeight, cardClass, mobileImgHeight} = defineProp
 
 // In some cases, like the Cancel page, we may want the hero image to take up a larger portion of the screen if there is nothing else to display.
 // This is especially true on mobile so we can optimize this 
-const myImgHeight = computed(() => {
-    const {smAndDown} = useDisplay()
-    console.log("GOT MOBILE: ", smAndDown.value)
-    console.log("GOT IMG HEIGHT: ", imgHeight);
-    console.log("GOT MOBILE IMG HEIGHT: ", mobileImgHeight);
-    
-        
-    return smAndDown.value ? mobileImgHeight : imgHeight
-    // return "300"
-})
+const { smAndDown } = useDisplay()
+
+const myImgHeight = computed(() => smAndDown.value ? mobileImgHeight : imgHeight)
 </script>
