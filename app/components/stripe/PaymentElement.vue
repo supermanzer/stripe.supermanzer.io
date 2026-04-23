@@ -12,7 +12,7 @@
                     <v-btn variant="elevated" color="grey" href="https://docs.stripe.com/testing" target="_blank" text="Test Docs" v-bind="props"/>
                 </template>
             </v-tooltip>
-            <v-btn variant="elevated" color="primary" text="Confirm" @click="confirmPayment"/>
+            <v-btn variant="elevated" color="primary" text="Confirm" @click="confirmIntent"/>
         </v-row>
 
 
@@ -52,8 +52,8 @@ const appearance = computed<Appearance>(() => ({
 // Loading Stripe.js and parameters
 const {$stripe} = useNuxtApp();
 const params = useStripeParams();
-// Loading our Payment Element composable
-const {data, error, execute} = usePaymentIntent();
+// Loading our Intent composable
+const {data, error, execute} = useIntent();
 // Defining URLs 
 const { origin } = useRequestURL();
 const { urls } = useAppConfig();
@@ -81,13 +81,16 @@ const mountElement = () => {
     if ($stripe == null) return;
 
     if (elementsType === ElementType.Deferred) {
-        const { amount, currency } = params.value.paymentIntent.server;
-        elements.value = $stripe.elements({
-            mode: 'payment',
-            currency: currency ?? 'usd',
-            amount: amount ?? 0,
-            appearance: appearance.value,
-        });
+        elements.value = $stripe.elements(
+            params.value.intentType === 'setup'
+                ? { mode: 'setup', currency: params.value.setupIntent.client.currency, appearance: appearance.value }
+                : {
+                    mode: 'payment',
+                    currency: params.value.paymentIntent.server.currency ?? 'usd',
+                    amount: params.value.paymentIntent.server.amount ?? 0,
+                    appearance: appearance.value,
+                }
+        );
     } else {
         if (error.value != null || data.value?.intent?.client_secret == null) {
             console.error("Failed to initialize Payment Element", { error: error.value, intent: data.value?.intent });
@@ -123,48 +126,44 @@ const reload = async () => {
     showReloadDialog.value = false
 }
 
-const confirmPayment = async () => {
-    if (elements.value === null || $stripe == null) {
-        console.error("Cannot confirm: Stripe or Elements not initialized");
-        return
+// Handles the intent-type dimension: routes to confirmSetup or confirmPayment.
+const doConfirm = async (clientSecret?: string) => {
+    if (!elements.value || !$stripe) return
+    const base = {
+        elements: elements.value,
+        ...(clientSecret ? { clientSecret } : {}),
     }
-
-    if (elementsType === ElementType.Deferred) {
-        // Step 1: validate the form fields before touching the server.
-        const { error: submitError } = await elements.value.submit();
-        if (submitError) {
-            console.error("PAYMENT ELEMENT SUBMIT ERROR:\n", submitError);
-            return;
-        }
-        // Step 2: create the Payment Intent server-side now that we know the form is valid.
-        await execute();
-        if (error.value || data.value?.intent?.client_secret == null) {
-            console.error("Failed to create Payment Intent for deferred confirmation", { error: error.value });
-            return;
-        }
-        // Step 3: confirm with the freshly-minted clientSecret passed explicitly.
-        const { error: confirmError } = await $stripe.confirmPayment({
-            elements: elements.value,
-            clientSecret: data.value.intent.client_secret,
-            confirmParams: {
-                return_url: successUrl,
-                ...params.value.paymentIntent.confirm,
-            }
-        });
-        if (confirmError) {
-            console.error("PAYMENT INTENT CONFIRMATION ERROR:\n", confirmError);
-        }
+    if (params.value.intentType === 'setup') {
+        const { error: confirmError } = await $stripe.confirmSetup({
+            ...base,
+            confirmParams: { return_url: successUrl, ...params.value.setupIntent.confirm },
+        })
+        if (confirmError) console.error('SETUP INTENT CONFIRMATION ERROR:\n', confirmError)
     } else {
         const { error: confirmError } = await $stripe.confirmPayment({
-            elements: elements.value,
-            confirmParams: {
-                return_url: successUrl,
-                ...params.value.paymentIntent.confirm,
-            }
-        });
-        if (confirmError) {
-            console.error("PAYMENT INTENT CONFIRMATION ERROR:\n", confirmError);
+            ...base,
+            confirmParams: { return_url: successUrl, ...params.value.paymentIntent.confirm },
+        })
+        if (confirmError) console.error('PAYMENT INTENT CONFIRMATION ERROR:\n', confirmError)
+    }
+}
+
+// Handles the elements-type dimension: deferred creates the intent on confirm; intent-first already has it.
+const confirmIntent = async () => {
+    if (!elements.value || !$stripe) {
+        console.error('Cannot confirm: Stripe or Elements not initialized')
+        return
+    }
+    if (elementsType === ElementType.Deferred) {
+        const { error: submitError } = await elements.value.submit()
+        if (submitError) { console.error('ELEMENT SUBMIT ERROR:\n', submitError); return }
+        await execute()
+        if (error.value || data.value?.intent?.client_secret == null) {
+            console.error('Failed to create intent for deferred confirmation', { error: error.value }); return
         }
+        await doConfirm(data.value.intent.client_secret)
+    } else {
+        await doConfirm()
     }
 }
 </script>

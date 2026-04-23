@@ -25,5 +25,8 @@ const confirmOnClick = async () => {
             return_url: "your.awesome.website.dev"
         }
     })
+    if (error) {
+        // Handle error
+    }
 }
 ```

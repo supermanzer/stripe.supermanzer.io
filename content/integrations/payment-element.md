@@ -9,8 +9,16 @@ docs:
 snippets:
 - path: intent-first/server
   label: server
-- path: intent-first/client
+  intentType: payment
+- path: intent-first/setup-server
+  label: server
+  intentType: setup
+- path: intent-first/payment-client
   label: client
+  intentType: payment
+- path: intent-first/setup-client
+  label: client
+  intentType: setup
 ---
 ::::layout-card{img="https://images.pexels.com/photos/4482896/pexels-photo-4482896.jpeg" title="Payment Element" subtitle="Collect multiple payment method types through a single interface" imgHeight="200"}
 #default

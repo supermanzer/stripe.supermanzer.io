@@ -9,7 +9,7 @@ const stripe = loadStripe("pk_******");
 
 // Create elements instance without an intent
 const elements = stripe.elements({
-    amount: 1999,
+    mode: 'setup'
     currency: "usd"
 });
 
@@ -29,7 +29,7 @@ const confirmOnClick = async() => {
     const { clientSecret } = await getItent();
 
     // Confirm Payment
-    const { error: confirmError } = await $stripe.confirmPayment({
+    const { error: confirmError } = await $stripe.confirmSetup({
         elements: elements.value,
         clientSecret: clientSecret,
         confirmParams: {
@@ -40,3 +40,4 @@ const confirmOnClick = async() => {
         // Handle error
     }
 }
+```
