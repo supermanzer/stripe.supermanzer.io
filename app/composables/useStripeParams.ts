@@ -10,8 +10,13 @@ export type PaymentIntentParams = {
 
 export type SetupIntentParams = {
   server: Partial<Stripe.SetupIntentCreateParams>
+  client: { currency: string }
   confirm: Partial<ConfirmSetupData>
 }
+
+// --- Integration flow param tyes ---
+
+export type intentTypes = 'payment' | 'setup'
 
 // App-level parameters that control the demo environment itself rather than
 // individual Stripe API calls. Changes here are expected to trigger side effects
@@ -30,9 +35,12 @@ export type AppParams = {
 export type StripeParamsState = {
   paymentIntent: PaymentIntentParams
   setupIntent: SetupIntentParams
+  intentType: intentTypes
   app: AppParams
   hasChanged: boolean
 }
+
+
 
 // --- Defaults ---
 
@@ -43,8 +51,10 @@ const defaults: StripeParamsState = {
   },
   setupIntent: {
     server: {},
+    client: { currency: 'usd' },
     confirm: {},
   },
+  intentType: 'payment',
   app: {},
   hasChanged: false
 }

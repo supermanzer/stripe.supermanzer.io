@@ -8,9 +8,17 @@ docs:
   url: https://docs.stripe.com/payments/payment-element
 snippets:
 - path: intent-first/server
+  intentType: payment
   label: server
-- path: deferred-intent/client
+- path: intent-first/setup-server
+  label: server
+  intentType: setup
+- path: deferred-intent/payment-client
   label: client
+  intentType: payment
+- path: deferred-intent/setup-client
+  label: client
+  intentType: setup
 ---
 ::::layout-card{img="https://images.pexels.com/photos/8327551/pexels-photo-8327551.jpeg" title="Deferred Intent" subtitle="Render the Payment Element first, only create and Intent when confirming" imgHeight="300"}
 #default

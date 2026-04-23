@@ -8,6 +8,7 @@ export interface Doc {
 export interface Snippet {
     path: string;
     label: 'server' | 'client';
+    intentType?: 'payment' | 'setup';
 }
 
 export enum ElementType {

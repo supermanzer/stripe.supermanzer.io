@@ -20,8 +20,12 @@ const docsOpen = ref(false)
 
 const pageSnippets = useState<Snippet[]>('page-snippets', () => [])
 const snippetsVisible = useState<boolean>('snippets-visible', () => false)
+const params = useStripeParams()
 
-watchEffect(() => { pageSnippets.value = page.value?.snippets ?? [] })
+watchEffect(() => {
+  const all = page.value?.snippets ?? []
+  pageSnippets.value = all.filter(s => !s.intentType || s.intentType === params.value.intentType)
+})
 onUnmounted(() => {
   pageSnippets.value = []
   snippetsVisible.value = false

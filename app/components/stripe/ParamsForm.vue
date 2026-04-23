@@ -1,11 +1,22 @@
 <template>
-  <v-card flat class="h-100">
+  <v-card flat class="h-100 pe-4 border-e-md">
     <v-card-title>Stripe Parameters</v-card-title>
     <v-divider />
     <v-card-subtitle>Update the below parameters to modify the integration</v-card-subtitle>
     <v-card-text>
+      <v-row justify="center">
+        <v-btn-toggle
+         v-model="intentType"
+         color="primary"
+         border
+         mandatory
+        >
+          <v-btn value="payment">Payment Intent</v-btn>
+          <v-btn value="setup">Setup Intent</v-btn>
+        </v-btn-toggle>
+      </v-row>
       <v-row>
-        <v-col cols="12" sm="12" md="12" lg="6">
+        <v-col v-if="intentType === 'payment'" cols="12" sm="12" md="12" lg="6">
           <v-text-field
             v-model.number="amount"
             label="Amount"
@@ -46,7 +57,22 @@ const amount = computed({
 })
 
 const currency = computed({
-  get: () => params.value.paymentIntent.server.currency ?? 'usd',
-  set: (val) => { params.value.paymentIntent.server.currency = val; params.value.hasChanged = true},
+  get: () => intentType.value === 'setup'
+    ? params.value.setupIntent.client.currency
+    : params.value.paymentIntent.server.currency ?? 'usd',
+  set: (val) => {
+    if (intentType.value === 'setup') {
+      params.value.setupIntent.client.currency = val
+    } else {
+      params.value.paymentIntent.server.currency = val
+    }
+    params.value.hasChanged = true
+  },
+})
+
+const intentType = computed({
+  get: () => params.value.intentType ?? 'payment',
+  set: (val) => {params.value.intentType = val;
+    params.value.hasChanged = true},
 })
 </script>
