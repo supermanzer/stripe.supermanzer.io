@@ -1,13 +1,17 @@
 ---
 language: javascript
+reference: https://docs.stripe.com/js/elements_object/create
 ---
 
 ```javascript
-const stripe = await loadStripe("pk_*******"); // Load Stripe.js using Publishable Key
+// Load Stripe.js using Publishable Key
+const stripe = await loadStripe("pk_*******"); 
 
-const {intent} = await getIntent() // retrieve Payment Intent from the server
+// retrieve Payment or Setup Intent client secret from the server
+const { clientSecret } = await getIntent() 
 
-const elements = stripe.elements({clientSecret: intent.client_secret}); // Create Elements instance with Payment Intent client secret
+// Create Elements instance with Payment Intent client secret
+const elements = stripe.elements({ clientSecret }); 
 
 // Create and mount Payment Element
 const element = elements.create('payment'); 

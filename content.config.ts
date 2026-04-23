@@ -20,6 +20,7 @@ export default defineContentConfig({
       source: 'snippets/**',
       schema: z.object({
         language: z.string(),
+        reference: z.string(),
       }),
     }),
   },

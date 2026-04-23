@@ -10,6 +10,9 @@
       <ContentRenderer v-if="content" :value="content" />
       <v-skeleton-loader v-else type="paragraph" />
     </v-card-text>
+    <v-card-actions v-if="content != null && hasReference">
+      <v-btn flat prepend-icon="mdi-code-tags" :href="content.reference">reference</v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -21,6 +24,10 @@ const { snippet } = defineProps<{ snippet: Snippet }>()
 const { data: content } = await useAsyncData('snippets-' + snippet.path, () =>
   queryCollection('snippets').path('/snippets/' + snippet.path).first()
 )
+
+const hasReference = computed(() => {
+  return Object.hasOwn(content.value ?? {}, 'reference')
+})
 
 const cardClass = computed(() =>
   snippet.label === 'server' ? 'border-s-4 border-indigo' : 'border-s-4 border-teal'
