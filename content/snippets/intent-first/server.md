@@ -1,13 +1,18 @@
 ---
 language: typescript
+reference: https://docs.stripe.com/api/payment_intents/create
 ---
 
 ```typescript
-const stripe = new Stripe("sk_********"); // create Stripe instance with Secret Key
+ // create Stripe instance with Secret Key
+const stripe = new Stripe("sk_********");
 
-const params = { amount: 1999, currency: 'usd' } // specify Payment Intent parameters (defaults shown here)
+// specify Payment Intent parameters (defaults shown here)
+const params = { amount: 1999, currency: 'usd' } 
 
-const paymentIntent = await stripe.paymentIntents.create(params) // create Payment Intent
+// create Payment Intent
+const paymentIntent = await stripe.paymentIntents.create(params) 
 
-return { intent: paymentIntent } // return Intent
+// return Intent
+return { intent: paymentIntent } 
 ```

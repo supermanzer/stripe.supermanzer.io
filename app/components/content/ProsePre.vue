@@ -10,7 +10,7 @@ defineProps({
   highlights: { type: Array, default: () => [] },
   meta: { type: String, default: null },
   class: { type: String, default: null },
-  style: { type: String, default: null },
+  style: { type: [String, Object], default: null },
 })
 </script>
 

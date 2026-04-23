@@ -27,7 +27,9 @@
             </v-row>
         </v-card-text>
         <v-card-actions v-if="$slots.actions" class="px-2 py-0">
-            <slot name="actions" />
+            <v-row justify="end">
+                <slot name="actions" />
+            </v-row>
         </v-card-actions>
     </v-card>
 </template>

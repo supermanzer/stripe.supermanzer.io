@@ -44,29 +44,31 @@ onUnmounted(() => {
       </v-row>
     </v-expand-transition>
 
-    <v-navigation-drawer
-      v-if="docs.length"
-      v-model="docsOpen"
-      location="right"
-      :width="380"
-      temporary
-    >
-      <stripe-docs-list :docs="docs" />
-    </v-navigation-drawer>
+    <ClientOnly>
+      <v-navigation-drawer
+        v-if="docs.length"
+        v-model="docsOpen"
+        location="right"
+        :width="380"
+        temporary
+      >
+        <stripe-docs-list :docs="docs" />
+      </v-navigation-drawer>
 
-    <v-tooltip text="documentation">
-      <template #activator="{props}">
-        <v-btn
-          v-if="docs.length"
-          icon="mdi-book-open-variant"
-          color="primary"
-          position="fixed"
-          v-bind="props"
-          :style="{ right: docsOpen ? '380px' : '0', top: '50%', transform: 'translateY(-50%)' }"
-          rounded="s-lg e-0"
-          @click="docsOpen = !docsOpen"
-        />
-      </template>
-    </v-tooltip>
+      <v-tooltip text="documentation">
+        <template #activator="{props}">
+          <v-btn
+            v-if="docs.length"
+            icon="mdi-book-open-variant"
+            color="primary"
+            position="fixed"
+            v-bind="props"
+            :style="{ right: docsOpen ? '380px' : '0', top: '50%', transform: 'translateY(-50%)' }"
+            rounded="s-lg e-0"
+            @click="docsOpen = !docsOpen"
+          />
+        </template>
+      </v-tooltip>
+    </ClientOnly>
   </div>
 </template>
