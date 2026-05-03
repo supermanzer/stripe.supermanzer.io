@@ -32,8 +32,11 @@ if (result.type === 'error') {
   return;
 }
 
-// Triggered by your own Confirm button click
-const { error } = await result.actions.confirm();
+// Email is not collected by the payment or billing elements — it must be
+// passed explicitly to confirm(), otherwise Stripe throws an IntegrationError.
+const customerEmail = document.getElementById('email-input').value;
+
+const { error } = await result.actions.confirm({ email: customerEmail });
 
 if (error) {
   // Display error to customer

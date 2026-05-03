@@ -3,6 +3,19 @@
     <v-card title="Checkout Elements" flat>
       <slot name="text" />
 
+      <!-- Email is required by Stripe to confirm a Checkout Session in elements
+           mode. It is not collected by the payment or billing elements — it must
+           be passed explicitly to actions.confirm({ email }). -->
+      <v-card-text class="pb-0">
+        <v-text-field
+          v-model="email"
+          label="Email"
+          type="email"
+          hint="Required to confirm the Checkout Session"
+          persistent-hint
+        />
+      </v-card-text>
+
       <!-- Payment and billing address elements mount into these divs -->
       <div id="checkout-payment-element" class="my-4" />
       <div id="checkout-billing-element" class="my-4" />
@@ -66,6 +79,7 @@ const { data, error, execute } = useCheckoutSession()
 const confirming = ref(false)
 const confirmError = ref<string | null>(null)
 const showReloadDialog = ref(false)
+const email = ref('')
 
 // Hold SDK and element references so we can clean up on reload.
 let checkoutSdk: StripeCheckoutElementsSdk | null = null
@@ -131,7 +145,9 @@ const confirmCheckout = async () => {
     return
   }
 
-  const { error: confirmErr } = await result.actions.confirm()
+  // email is not collected by the payment or billing elements —
+  // it must be passed explicitly, otherwise Stripe throws an IntegrationError.
+  const { error: confirmErr } = await result.actions.confirm({ email: email.value })
 
   if (confirmErr) {
     confirmError.value = confirmErr.message ?? 'Confirmation failed'
@@ -161,5 +177,6 @@ const reload = async () => {
 
   params.value.hasChanged = false
   showReloadDialog.value = false
+  email.value = ''
 }
 </script>
