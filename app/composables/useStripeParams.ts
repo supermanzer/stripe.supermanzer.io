@@ -1,5 +1,6 @@
 import type { Stripe } from 'stripe'
 import type { ConfirmPaymentData, ConfirmSetupData } from '@stripe/stripe-js'
+import type { CheckoutUiMode } from '#shared/types'
 
 // --- Per-object param types ---
 
@@ -14,7 +15,15 @@ export type SetupIntentParams = {
   confirm: Partial<ConfirmSetupData>
 }
 
-// --- Integration flow param tyes ---
+// Checkout Sessions bundle both server creation params and the ui_mode choice
+// together because ui_mode drives URL config and client-side initialization —
+// it belongs to the session concept rather than being a separate app-level concern.
+export type CheckoutSessionParams = {
+  server: Partial<Stripe.Checkout.SessionCreateParams>
+  uiMode: CheckoutUiMode
+}
+
+// --- Integration flow param types ---
 
 export type intentTypes = 'payment' | 'setup'
 
@@ -35,6 +44,9 @@ export type AppParams = {
 export type StripeParamsState = {
   paymentIntent: PaymentIntentParams
   setupIntent: SetupIntentParams
+  // checkoutSession lives alongside intent slices rather than in a separate
+  // composable so that cross-cutting fields (app, hasChanged) stay in one store.
+  checkoutSession: CheckoutSessionParams
   intentType: intentTypes
   app: AppParams
   hasChanged: boolean
@@ -46,7 +58,7 @@ export type StripeParamsState = {
 
 const defaults: StripeParamsState = {
   paymentIntent: {
-    server: { amount: 1999, currency: 'usd' }, // default values for required parameters
+    server: { amount: 1999, currency: 'usd' },
     confirm: {},
   },
   setupIntent: {
@@ -54,9 +66,27 @@ const defaults: StripeParamsState = {
     client: { currency: 'usd' },
     confirm: {},
   },
+  checkoutSession: {
+    server: {
+      mode: 'payment',
+      // price_data lets us define the product inline without needing a
+      // pre-existing product or price in the Stripe dashboard.
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Demo Product' },
+            unit_amount: 1999,
+          },
+          quantity: 1,
+        },
+      ],
+    },
+    uiMode: 'hosted',
+  },
   intentType: 'payment',
   app: {},
-  hasChanged: false
+  hasChanged: false,
 }
 
 // --- Composable ---
