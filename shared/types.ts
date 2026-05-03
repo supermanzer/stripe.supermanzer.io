@@ -15,3 +15,6 @@ export enum ElementType {
     IntentFirst = "intent-first",
     Deferred = "deferred"
 }
+
+export type CheckoutUiMode = 'hosted' | 'embedded_page' | 'elements'
+export type CheckoutMode = 'payment' | 'subscription' | 'setup'
