@@ -14,10 +14,15 @@
         />
       </v-row>
 
-      <!-- Embedded page: Stripe mounts an iframe into this div -->
-      <div v-if="uiMode === 'embedded_page'" id="checkout" />
+      <!-- Embedded page: Stripe mounts an iframe into this div.
+           min-height ensures the card has room to expand before the iframe
+           loads — without it the container collapses and the checkout is invisible. -->
+      <div v-if="uiMode === 'embedded_page'" id="checkout" class="checkout-mount" />
 
-      <v-dialog v-model="showReloadDialog" max-width="480" persistent contained>
+      <!-- No 'contained' — the dialog must overlay the viewport, not the card.
+           The card's height varies with the embedded iframe, so containing the
+           dialog would leave it invisible or clipped when the form is small. -->
+      <v-dialog v-model="showReloadDialog" max-width="480" persistent>
         <v-card>
           <v-card-title>Parameters Changed</v-card-title>
           <v-divider />
@@ -117,3 +122,11 @@ const reload = async () => {
   showReloadDialog.value = false
 }
 </script>
+
+<style scoped>
+/* Gives the card enough room to display the Stripe iframe before it finishes
+   loading and self-sizes. 650px covers the typical embedded checkout height. */
+.checkout-mount {
+  min-height: 650px;
+}
+</style>
