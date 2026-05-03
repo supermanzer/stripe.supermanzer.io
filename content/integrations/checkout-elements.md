@@ -23,7 +23,7 @@ snippets:
     Confirmation is explicit: you call `actions.confirm()` on your own button click, rather than Stripe handling it internally.
 
   #left
-    ::stripe-checkout-params-form
+    ::stripe-checkout-params-form{context="elements"}
     ::
 
   #right

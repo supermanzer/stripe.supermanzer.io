@@ -16,5 +16,7 @@ export enum ElementType {
     Deferred = "deferred"
 }
 
-export type CheckoutUiMode = 'hosted_page' | 'embedded_page' | 'elements'
+// 'custom' uses the same initCheckoutElementsSdk client API as 'elements' but
+// with a different server-side session configuration for custom form layouts.
+export type CheckoutUiMode = 'hosted_page' | 'embedded_page' | 'elements' | 'custom'
 export type CheckoutMode = 'payment' | 'subscription' | 'setup'

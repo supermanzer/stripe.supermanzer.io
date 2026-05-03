@@ -11,9 +11,20 @@
           border
           mandatory
         >
-          <!-- Elements mode is a separate integration — see CheckoutElements.vue -->
-          <v-btn value="hosted_page">Hosted</v-btn>
-          <v-btn value="embedded_page">Embedded</v-btn>
+          <!-- Session context: hosted and embedded page modes only.
+               Elements/custom modes use initCheckoutElementsSdk and belong
+               to the checkout-elements integration page. -->
+          <template v-if="context === 'session'">
+            <v-btn value="hosted_page">Hosted</v-btn>
+            <v-btn value="embedded_page">Embedded</v-btn>
+          </template>
+
+          <!-- Elements context: only modes compatible with initCheckoutElementsSdk.
+               hosted_page and embedded_page cannot be used with this SDK. -->
+          <template v-if="context === 'elements'">
+            <v-btn value="elements">Elements</v-btn>
+            <v-btn value="custom">Custom</v-btn>
+          </template>
         </v-btn-toggle>
       </v-row>
       <v-row>
@@ -62,6 +73,15 @@
 <script setup lang="ts">
 import type { CheckoutUiMode } from '#shared/types'
 
+// 'session' shows hosted_page / embedded_page.
+// 'elements' shows elements / custom — the only modes compatible with
+// initCheckoutElementsSdk. Passing the wrong context here would allow the
+// user to set a uiMode that causes a server-side Stripe API error.
+const { context } = withDefaults(
+  defineProps<{ context?: 'session' | 'elements' }>(),
+  { context: 'session' }
+)
+
 const currencies = [
   { value: 'usd', title: 'USD - US Dollar' },
   { value: 'eur', title: 'EUR - Euro' },
@@ -71,6 +91,18 @@ const currencies = [
 ]
 
 const params = useStripeParams()
+
+// The params store is shared across pages. If the user visited the
+// checkout-session page first, uiMode may be 'hosted_page' or 'embedded_page'.
+// Reset to 'elements' so CheckoutElements.vue never sends an incompatible mode.
+onMounted(() => {
+  if (context === 'elements') {
+    const current = params.value.checkoutSession.uiMode
+    if (current !== 'elements' && current !== 'custom') {
+      params.value.checkoutSession.uiMode = 'elements'
+    }
+  }
+})
 
 // Helper to safely reach into the nested line_items structure without
 // repeating the same deep path throughout computed getters/setters.
