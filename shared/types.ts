@@ -16,5 +16,5 @@ export enum ElementType {
     Deferred = "deferred"
 }
 
-export type CheckoutUiMode = 'hosted' | 'embedded_page' | 'elements'
+export type CheckoutUiMode = 'hosted_page' | 'embedded_page' | 'elements'
 export type CheckoutMode = 'payment' | 'subscription' | 'setup'
