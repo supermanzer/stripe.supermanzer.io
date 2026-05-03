@@ -11,7 +11,7 @@
           border
           mandatory
         >
-          <v-btn value="hosted">Hosted</v-btn>
+          <v-btn value="hosted_page">Hosted</v-btn>
           <v-btn value="embedded_page">Embedded</v-btn>
           <v-btn value="elements">Elements</v-btn>
         </v-btn-toggle>

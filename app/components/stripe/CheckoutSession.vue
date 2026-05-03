@@ -3,8 +3,8 @@
     <v-card title="Checkout Session" flat>
       <slot name="text" />
 
-      <!-- Hosted: just a button — the checkout UI lives on Stripe's domain -->
-      <v-row v-if="uiMode === 'hosted'" class="my-6" justify="space-around">
+      <!-- Hosted page: just a button — the checkout UI lives on Stripe's domain -->
+      <v-row v-if="uiMode === 'hosted_page'" class="my-6" justify="space-around">
         <v-btn
           variant="elevated"
           color="primary"
@@ -80,8 +80,9 @@ watch(() => params.value.hasChanged, (changed) => {
     // destroying an active checkout mid-fill.
     showReloadDialog.value = true
   } else {
-    // Hosted mode is stateless per click; no surface to reload.
-    // Just clear the flag so future changes are detected correctly.
+    // hosted_page is stateless per click — a fresh session is always created
+    // on the next button press, so there's nothing to reload.
+    // Clear the flag so future changes are detected correctly.
     params.value.hasChanged = false
   }
 })

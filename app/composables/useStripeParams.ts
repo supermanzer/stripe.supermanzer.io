@@ -82,7 +82,7 @@ const defaults: StripeParamsState = {
         },
       ],
     },
-    uiMode: 'hosted',
+    uiMode: 'hosted_page',
   },
   intentType: 'payment',
   app: {},
