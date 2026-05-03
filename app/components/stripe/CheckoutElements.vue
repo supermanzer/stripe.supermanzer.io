@@ -33,7 +33,7 @@
         {{ confirmError }}
       </v-alert>
 
-      <v-dialog v-model="showReloadDialog" max-width="480" persistent contained>
+      <v-dialog v-model="showReloadDialog" max-width="480" persistent>
         <v-card>
           <v-card-title>Parameters Changed</v-card-title>
           <v-divider />
@@ -76,8 +76,15 @@ const appearance = computed<Appearance>(() => ({
   theme: isDark.value ? 'night' : 'stripe',
 }))
 
-// Elements mode requires a session client_secret before the SDK can be
-// initialized — create the session up front before the component mounts.
+// The params store is shared across pages. If the user visited the
+// checkout-session page first, uiMode may be 'hosted_page' or 'embedded_page'.
+// Those sessions don't return a client_secret, which initCheckoutElementsSdk
+// requires. Enforce compatibility here rather than relying on CheckoutParamsForm's
+// onMounted correction — that runs after this execute() call, so it's too late.
+if (params.value.checkoutSession.uiMode !== 'elements' && params.value.checkoutSession.uiMode !== 'custom') {
+  params.value.checkoutSession.uiMode = 'elements'
+}
+
 await execute()
 
 const mountElements = () => {
@@ -141,6 +148,12 @@ const reload = async () => {
   paymentElement = null
   billingElement = null
   checkoutSdk = null
+
+  // Re-apply the uiMode guard in case params changed to an incompatible mode
+  // between initial mount and reload (e.g. via direct store manipulation).
+  if (params.value.checkoutSession.uiMode !== 'elements' && params.value.checkoutSession.uiMode !== 'custom') {
+    params.value.checkoutSession.uiMode = 'elements'
+  }
 
   await execute()
   await nextTick()
