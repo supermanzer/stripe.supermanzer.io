@@ -3,6 +3,19 @@
     <v-card title="Checkout Elements" flat>
       <slot name="text" />
 
+      <!-- Email is required by Stripe to confirm a Checkout Session in elements
+           mode. It is not collected by the payment or billing elements — it must
+           be passed explicitly to actions.confirm({ email }). -->
+      <v-card-text class="pb-0">
+        <v-text-field
+          v-model="email"
+          label="Email"
+          type="email"
+          hint="Required to confirm the Checkout Session"
+          persistent-hint
+        />
+      </v-card-text>
+
       <!-- Payment and billing address elements mount into these divs -->
       <div id="checkout-payment-element" class="my-4" />
       <div id="checkout-billing-element" class="my-4" />
@@ -33,7 +46,7 @@
         {{ confirmError }}
       </v-alert>
 
-      <v-dialog v-model="showReloadDialog" max-width="480" persistent contained>
+      <v-dialog v-model="showReloadDialog" max-width="480" persistent>
         <v-card>
           <v-card-title>Parameters Changed</v-card-title>
           <v-divider />
@@ -66,6 +79,7 @@ const { data, error, execute } = useCheckoutSession()
 const confirming = ref(false)
 const confirmError = ref<string | null>(null)
 const showReloadDialog = ref(false)
+const email = ref('')
 
 // Hold SDK and element references so we can clean up on reload.
 let checkoutSdk: StripeCheckoutElementsSdk | null = null
@@ -76,8 +90,17 @@ const appearance = computed<Appearance>(() => ({
   theme: isDark.value ? 'night' : 'stripe',
 }))
 
-// Elements mode requires a session client_secret before the SDK can be
-// initialized — create the session up front before the component mounts.
+// The params store is shared across pages. If the user visited the
+// checkout-session page first, uiMode may be 'hosted_page' or 'embedded_page'.
+// Those sessions don't return a client_secret, which initCheckoutElementsSdk
+// requires. Enforce compatibility here rather than relying on CheckoutParamsForm's
+// onMounted correction — that runs after this execute() call, so it's too late.
+// Only 'elements' returns a client_secret — hosted_page and embedded_page do not,
+// so initCheckoutElementsSdk would fail. Guard before creating the session.
+if (params.value.checkoutSession.uiMode !== 'elements') {
+  params.value.checkoutSession.uiMode = 'elements'
+}
+
 await execute()
 
 const mountElements = () => {
@@ -124,7 +147,9 @@ const confirmCheckout = async () => {
     return
   }
 
-  const { error: confirmErr } = await result.actions.confirm()
+  // email is not collected by the payment or billing elements —
+  // it must be passed explicitly, otherwise Stripe throws an IntegrationError.
+  const { error: confirmErr } = await result.actions.confirm({ email: email.value })
 
   if (confirmErr) {
     confirmError.value = confirmErr.message ?? 'Confirmation failed'
@@ -142,11 +167,18 @@ const reload = async () => {
   billingElement = null
   checkoutSdk = null
 
+  // Re-apply the uiMode guard in case params changed to an incompatible mode
+  // between initial mount and reload (e.g. via direct store manipulation).
+  if (params.value.checkoutSession.uiMode !== 'elements') {
+    params.value.checkoutSession.uiMode = 'elements'
+  }
+
   await execute()
   await nextTick()
   mountElements()
 
   params.value.hasChanged = false
   showReloadDialog.value = false
+  email.value = ''
 }
 </script>

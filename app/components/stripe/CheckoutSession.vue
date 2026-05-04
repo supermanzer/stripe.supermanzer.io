@@ -14,10 +14,15 @@
         />
       </v-row>
 
-      <!-- Embedded page: Stripe mounts an iframe into this div -->
-      <div v-if="uiMode === 'embedded_page'" id="checkout" />
+      <!-- Embedded page: Stripe mounts an iframe into this div.
+           min-height ensures the card has room to expand before the iframe
+           loads — without it the container collapses and the checkout is invisible. -->
+      <div v-if="uiMode === 'embedded_page'" id="checkout" class="checkout-mount" />
 
-      <v-dialog v-model="showReloadDialog" max-width="480" persistent contained>
+      <!-- No 'contained' — the dialog must overlay the viewport, not the card.
+           The card's height varies with the embedded iframe, so containing the
+           dialog would leave it invisible or clipped when the form is small. -->
+      <v-dialog v-model="showReloadDialog" max-width="480" persistent>
         <v-card>
           <v-card-title>Parameters Changed</v-card-title>
           <v-divider />
@@ -36,14 +41,15 @@
 
 <script setup lang="ts">
 import type { StripeEmbeddedCheckout } from '@stripe/stripe-js'
-import type { CheckoutUiMode } from '#shared/types'
-
-const { uiMode } = defineProps<{ uiMode: CheckoutUiMode }>()
 
 const { $stripe } = useNuxtApp()
 const params = useStripeParams()
 const { data, error, pending, execute } = useCheckoutSession()
 const showReloadDialog = ref(false)
+
+// uiMode is read from the params store so the CheckoutParamsForm toggle
+// directly controls which UI surface this component displays.
+const uiMode = computed(() => params.value.checkoutSession.uiMode)
 
 // Hold the embedded checkout instance so we can destroy and remount it when
 // params change — destroy() is required before creating a new instance.
@@ -51,7 +57,7 @@ let embeddedCheckout: StripeEmbeddedCheckout | null = null
 
 // Embedded page needs the session created before mount so we have the
 // client_secret ready for createEmbeddedCheckoutPage().
-if (uiMode === 'embedded_page') {
+if (uiMode.value === 'embedded_page') {
   await execute()
 }
 
@@ -67,22 +73,24 @@ const mountEmbedded = async () => {
 }
 
 onMounted(async () => {
-  if (uiMode === 'embedded_page') {
+  if (uiMode.value === 'embedded_page') {
     await mountEmbedded()
   }
 })
 
-watch(() => params.value.hasChanged, (changed) => {
+watch(() => params.value.hasChanged, async (changed) => {
   if (!changed) return
 
-  if (uiMode === 'embedded_page') {
+  if (uiMode.value === 'embedded_page') {
     // Show a dialog so the user explicitly triggers the remount — avoids
     // destroying an active checkout mid-fill.
     showReloadDialog.value = true
   } else {
     // hosted_page is stateless per click — a fresh session is always created
     // on the next button press, so there's nothing to reload.
-    // Clear the flag so future changes are detected correctly.
+    // If we were previously in embedded mode, clean up the instance.
+    embeddedCheckout?.destroy()
+    embeddedCheckout = null
     params.value.hasChanged = false
   }
 })
@@ -114,3 +122,11 @@ const reload = async () => {
   showReloadDialog.value = false
 }
 </script>
+
+<style scoped>
+/* Gives the card enough room to display the Stripe iframe before it finishes
+   loading and self-sizes. 650px covers the typical embedded checkout height. */
+.checkout-mount {
+  min-height: 650px;
+}
+</style>
