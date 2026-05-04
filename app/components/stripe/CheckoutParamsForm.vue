@@ -19,11 +19,10 @@
             <v-btn value="embedded_page">Embedded</v-btn>
           </template>
 
-          <!-- Elements context: only modes compatible with initCheckoutElementsSdk.
-               hosted_page and embedded_page cannot be used with this SDK. -->
+          <!-- Elements context: only 'elements' is compatible with initCheckoutElementsSdk.
+               hosted_page and embedded_page do not return a client_secret, which the SDK requires. -->
           <template v-if="context === 'elements'">
             <v-btn value="elements">Elements</v-btn>
-            <v-btn value="custom">Custom</v-btn>
           </template>
         </v-btn-toggle>
       </v-row>

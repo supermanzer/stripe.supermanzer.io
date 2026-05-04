@@ -95,7 +95,9 @@ const appearance = computed<Appearance>(() => ({
 // Those sessions don't return a client_secret, which initCheckoutElementsSdk
 // requires. Enforce compatibility here rather than relying on CheckoutParamsForm's
 // onMounted correction — that runs after this execute() call, so it's too late.
-if (params.value.checkoutSession.uiMode !== 'elements' && params.value.checkoutSession.uiMode !== 'custom') {
+// Only 'elements' returns a client_secret — hosted_page and embedded_page do not,
+// so initCheckoutElementsSdk would fail. Guard before creating the session.
+if (params.value.checkoutSession.uiMode !== 'elements') {
   params.value.checkoutSession.uiMode = 'elements'
 }
 
@@ -167,7 +169,7 @@ const reload = async () => {
 
   // Re-apply the uiMode guard in case params changed to an incompatible mode
   // between initial mount and reload (e.g. via direct store manipulation).
-  if (params.value.checkoutSession.uiMode !== 'elements' && params.value.checkoutSession.uiMode !== 'custom') {
+  if (params.value.checkoutSession.uiMode !== 'elements') {
     params.value.checkoutSession.uiMode = 'elements'
   }
 
