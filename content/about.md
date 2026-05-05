@@ -12,7 +12,7 @@ This is not an exhaustive list and no one should rely purely on these examples f
 ## Code
 You can find the actual code that runs this site at the following repository: https://github.com/supermanzer/stripe.supermanzer.io
 
-This code differs from what is presented on each integration page.  For the integration examples I am trying to provide the most simple code I can.  For this site, I am attempting to make use of composable functions and managing state in a way that makes it easy to add new integrations provide the user interfaces I'm designing.  
+This code differs from what is presented on each integration page.  For the integration examples I am trying to provide the simplest code I can.  For this site, I am attempting to make use of composable functions and managing state in a way that makes it easy to add new integrations and provide the user interfaces I'm designing.  
 
 The examples I'm creating are to share some examples of integrating Stripe.  I hope other people find them useful and interesting.  The code that powers them is a learning process for me to better understand how to construct web applications with a high degree of user interactions and shared state.  I find that interesting to reason through.  So 🤞 everyone is learning something!
 
