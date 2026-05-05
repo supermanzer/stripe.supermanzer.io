@@ -9,6 +9,13 @@ The integrations presented here attempt to cover both many common use cases and 
 
 This is not an exhaustive list and no one should rely purely on these examples for how to build Stripe integrations.  The [Stripe docs][def3] are still the autoritative source for guides on integrating Stripe products.  I just think it's fun to build some examples and share them with people.
 
+## Code
+You can find the actual code that runs this site at the following repository: [supermanzer/stripe.supermanzer.io][def6]
+
+This code differs from what is presented on each integration page.  For the integration examples I am trying to provide the simplest code I can.  For this site, I am attempting to make use of composable functions and managing state in a way that makes it easy to add new integrations and provide the user interfaces I'm designing.  
+
+The examples I'm creating are to share some examples of integrating Stripe.  I hope other people find them useful and interesting.  The code that powers them is a learning process for me to better understand how to construct web applications with a high degree of user interactions and shared state.  I find that interesting to reason through.  So everyone is learning something!
+
 ## Inspiration
 This site was inspired by the brilliant work of my colleagues (current and former). You can see their genius and admire the different takes each of us has on web design by checking out [4242.io][def4] and [stripe.erintalyor.dev][def5].  
 
@@ -20,3 +27,4 @@ There are similarities and differences with how each of those sites present simi
 [def3]: https://docs.stripe.com/
 [def4]: https://4242.io/test/
 [def5]: https://stripe.erintaylor.dev
+[def6]: https://github.com/supermanzer/stripe.supermanzer.io
